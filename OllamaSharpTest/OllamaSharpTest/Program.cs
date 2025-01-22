@@ -3,10 +3,6 @@ using Whisper.net;
 using NAudio.Wave;
 using System.Speech.Synthesis;
 using Whisper.net.Logger;
-using System.Reflection;
-using NAudio.Wave.SampleProviders;
-using Whisper.net.Ggml;
-using System;
 
 namespace OllamaSharpTest
 {

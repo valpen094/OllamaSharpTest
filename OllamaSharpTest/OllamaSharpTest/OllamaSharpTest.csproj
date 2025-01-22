@@ -8,8 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SemanticKernel" Version="1.33.0" />
-    <PackageReference Include="Microsoft.SemanticKernel.Connectors.Ollama" Version="1.25.0-alpha" />
     <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="OllamaSharp" Version="5.0.3" />
     <PackageReference Include="System.Speech" Version="9.0.1" />
