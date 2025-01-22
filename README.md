@@ -11,5 +11,5 @@ C#
 
 ## whisper.net
 1. Hugging Face (https://huggingface.co/ggerganov/whisper.cpp/tree/main) にアクセスする。
-2. small、base、medium、large の順に音声認識の精度が上がる。適当なモデルデータをダウンロードする。
+2. 適当なモデルデータをダウンロード。small、base、medium、large の順に音声認識の精度が上がる。
 3. 実行ファイルが読み込むディレクトリにbinファイルを置く。
