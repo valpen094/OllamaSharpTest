@@ -8,7 +8,7 @@ namespace OllamaSharpTest
 {
     internal class Program
     {
-        private static OllamaApiClient ollama;
+        private static OllamaApiClient OllamaClient;
 
         static async Task<string> Record()
         {
@@ -75,7 +75,7 @@ namespace OllamaSharpTest
             return prompt;
         }
 
-        static async Task Chat(string prompt)
+        static async Task<string> Chat(string prompt)
         {
             string generated = string.Empty;
 
@@ -95,18 +95,20 @@ namespace OllamaSharpTest
             Console.Write("AI: ");
 
             // Start generation
-            await foreach (var answerToken in new Chat(ollama).SendAsync(prompt))
+            await foreach (var answerToken in new Chat(OllamaClient).SendAsync(prompt))
             {
                 generated += answerToken;
                 Console.Write(answerToken);
             }
 
+            return generated;
+        }
+
+        static void Ondoku(string script)
+        {
             // Start reading aloud
-            if (true)
-            {
-                using var synthesizer = new SpeechSynthesizer() { Volume = 100, Rate = 0 };
-                synthesizer.Speak(generated);
-            }
+            using var synthesizer = new SpeechSynthesizer() { Volume = 100, Rate = 0 };
+            synthesizer.Speak(script);
 
             // For line breaks
             Console.WriteLine();
@@ -116,18 +118,18 @@ namespace OllamaSharpTest
         {
             // Initialize Ollama
             var uri = new Uri("http://localhost:11434");
-            ollama = new OllamaApiClient(uri);
+            OllamaClient = new OllamaApiClient(uri);
 
             // select a model which should be used for further operations
-            ollama.SelectedModel = "phi3";
+            OllamaClient.SelectedModel = "phi3";
 
             // Listing all models that are available locally
-            var models = await ollama.ListLocalModelsAsync();
+            var models = await OllamaClient.ListLocalModelsAsync();
             Console.WriteLine($"Connecting to {uri} ...");
 
             // Pulling a model and reporting progress
             // Send/receive log
-            await foreach (var status in ollama.PullModelAsync("phi3"))
+            await foreach (var status in OllamaClient.PullModelAsync("phi3"))
             {
                 Console.WriteLine($"{status.Percent}% {status.Status}");
             }
@@ -136,6 +138,7 @@ namespace OllamaSharpTest
 
             string prompt = string.Empty;
 
+#if true
             while (true)
             {
                 if (true)
@@ -145,8 +148,15 @@ namespace OllamaSharpTest
                 }
 
                 // Chat with AI
-                await Chat(prompt);
+                string script = await Chat(prompt);
+
+                if (true)
+                {
+                    // Reading aloud
+                    Ondoku(script);
+                }
             }
+#endif
         }
     }
 }
