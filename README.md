@@ -6,13 +6,16 @@ C#
 # ■事前準備
 ## Ollama
 1. Ollama (https://ollama.com/download) のインストーラーをリンクからダウンロード及びインストールする。
-2. コマンドプロンプトまたはPowerShellから `ollama pull phi3:latest` を実行する。
-3. `ollama serve` を実行してローカルサーバーを立ち上げる。
+2. K/V context cache量子化を有効にするために、ターミナルから以下のコマンドを実行。
+- `SETX OLLAMA_FLASH_ATTENTION 1`
+- `SETX OLLAMA_KV_CACHE_TYPE "q8_0"`
+3. `ollama pull phi3:latest` を実行してモデルをダウンロードする。
+4. `ollama serve` を実行してローカルサーバーを立ち上げる。エラーの場合、既にサーバーが立ち上がっているので無視する。
 
 ## whisper.net
 1. Hugging Face (https://huggingface.co/ggerganov/whisper.cpp/tree/main) にアクセスする。
-2. 適当なモデルデータをダウンロード。small、base、medium、large の順に音声認識の精度が上がる。
-3. 実行ファイルが読み込むディレクトリにbinファイルを置く。
+2. 適当なモデルデータをダウンロード。音声認識の精度は、small、base、medium、large の順に高くなっていく。
+4. OllamaSharpTestが出力されるディレクトリにbinファイルを置く。
 
 ## chromadb
 1. `pip install chromadb` を実行する。
