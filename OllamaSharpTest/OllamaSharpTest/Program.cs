@@ -3,10 +3,11 @@ using Whisper.net;
 using NAudio.Wave;
 using System.Speech.Synthesis;
 using Whisper.net.Logger;
+using ChromaDB.Client;
 
 namespace OllamaSharpTest
 {
-    internal class Program
+    class Program
     {
         private static OllamaApiClient OllamaClient;
 
@@ -114,6 +115,46 @@ namespace OllamaSharpTest
             Console.WriteLine();
         }
 
+        static async Task<List<float[]>> Embed(string prompt)
+        {
+            var result = await OllamaClient.EmbedAsync(prompt);
+            List<float[]> vectors = result.Embeddings;
+
+            // Commented out due to large number of outputs
+
+            /*
+            // Display numeric vector
+            Console.WriteLine("Embedding Vector:");
+            foreach (var embedding in result.Embeddings)
+            {
+                foreach(var value in embedding)
+                {
+
+                    Console.Write($"{value:F6} ");
+                }
+            }
+
+            Console.WriteLine();
+            */
+
+            return vectors;
+        }
+
+        static async Task hoge()
+        {
+            var configOptions = new ChromaConfigurationOptions(uri: "http://localhost:8000/api/v1/");
+            using var httpClient = new HttpClient();
+            var client = new ChromaClient(configOptions, httpClient);
+
+            var string5Collection = client.GetOrCreateCollection("string5");
+            var string5Client = new ChromaCollectionClient(await string5Collection, configOptions, httpClient);
+
+            string5Client.Add(["340a36ad-c38a-406c-be38-250174aee5a4"], embeddings: [new([1f, 0.5f, 0f, -0.5f, -1f])]);
+
+            var getResult = string5Client.Get("340a36ad-c38a-406c-be38-250174aee5a4", include: ChromaGetInclude.Metadatas | ChromaGetInclude.Documents | ChromaGetInclude.Embeddings);
+            Console.WriteLine($"ID: {getResult!.Id}");
+        }
+
         static async Task Main()
         {
             // Initialize Ollama
@@ -138,6 +179,9 @@ namespace OllamaSharpTest
 
             string prompt = string.Empty;
 
+            // Chromadb.Client サンプルコード動作確認用（削除予定）
+            await hoge();
+
 #if true
             while (true)
             {
@@ -149,6 +193,9 @@ namespace OllamaSharpTest
 
                 // Chat with AI
                 string script = await Chat(prompt);
+
+                // Convert prompt to numeric vector
+                await Embed(prompt);
 
                 if (true)
                 {
