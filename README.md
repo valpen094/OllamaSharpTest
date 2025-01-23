@@ -20,7 +20,7 @@ C#
 3. 上記実行後、コンソールに以下のように出力されればOK。
    ![image](https://github.com/user-attachments/assets/dfe868ba-0b94-4601-9c8e-d3ad04b26220)
 
-# データセット
+# ■データセット
 - e-Stat (https://www.e-stat.go.jp/stat-search/files?page=1&query=csv&layout=dataset)
 - 法人番号公表サイト (https://www.houjin-bangou.nta.go.jp/download/zenken/index.html#csv-sjis)
 - 東京都オープンデータカタログサイト (https://catalog.data.metro.tokyo.lg.jp/dataset)
