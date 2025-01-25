@@ -2,9 +2,10 @@ import ollama
 import chromadb
 import pandas as pd
 import os
+from chromadb.config import Settings
 
-client = chromadb.Client()
-collection = client.create_collection(name="docs")
+client = chromadb.PersistentClient(path="../chromadb", settings=Settings(allow_reset=True))
+collection = client.get_or_create_collection(name="docs")
 csv_file=os.listdir('../convert')
 
 i=0
