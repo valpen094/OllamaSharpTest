@@ -1,10 +1,11 @@
 # ■OllamaSharpTest
-C#製のローカルLLM実行用のテストアプリ。データベースを操作するツールはPythonで作成。<br>以下の機能を実装済み。
+C#製のRAGアプリ。データベースを操作するツールはPythonで作成。<br>以下の機能を実装済み。
 - 音声認識
 - ローカルLLMとの対話
 - 読み上げ
-- ベクトルデータベース検索
-
+- ベクトルデータベース検索及び情報取得
+- RAG
+  
 # ■言語
 - C#
 - Python
@@ -56,6 +57,11 @@ C#製のローカルLLM実行用のテストアプリ。データベースを操
 ./chromadb のデータベース情報をクリアする。ファイル容量は変わらない。
 - `pip install chromadb`
 
+## ./python/reset_database.py 
+./chromadb のデータベースからベクトル距離が近い情報を抽出する。検索したい内容はスクリプトのuser_textを編集すること。
+- `pip install ollama`
+- `pip install chromadb`
+  
 ## ./python/to_utf8.py
 ./convert に置かれているファイルをutf-8に変換して./convert/utf8 に保存する。（元からutf-8のファイルも含む）
 1. `pip install codecs`
