@@ -38,7 +38,7 @@ C#製のRAGアプリ。データベースを操作するツールはPythonで作
 3. OllamaSharpTest.exe を実行する。
 4. 自動的にレコーディングが始まるため、質問したいことを話す。<br>
    ![image](https://github.com/user-attachments/assets/192d6112-a578-4b96-a672-644103c6f903)
-5. 音声入力したくない場合、Enterを押すとテキスト入力待ちになる。
+5. 音声入力したくない場合、Enterを押すとテキスト入力待ちになる。<br>
    ![image](https://github.com/user-attachments/assets/1d1ff1e3-2a1e-4438-b90e-73e95ae12b11)
 6. 音声認識またはテキスト入力されるとAIが自動回答する。<br>
    ![image](https://github.com/user-attachments/assets/36fe0b9b-9541-4b6e-8138-12bbe0f4f9b3)
