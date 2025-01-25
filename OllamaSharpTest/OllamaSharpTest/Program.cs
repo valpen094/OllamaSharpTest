@@ -4,6 +4,7 @@ using NAudio.Wave;
 using System.Speech.Synthesis;
 using Whisper.net.Logger;
 using ChromaDB.Client;
+using System.Diagnostics;
 
 namespace OllamaSharpTest
 {
@@ -49,54 +50,53 @@ namespace OllamaSharpTest
                 }
             }
 
-            var fileStream = File.OpenRead(wavFileName);
-
             string prompt = string.Empty;
-
-            // This section processes the audio file and prints the results (start time, end time and text) to the console.
-            await foreach (var result in processor.ProcessAsync(fileStream))
-            {
-                Console.WriteLine($"{result.Start}->{result.End}: {result.Text}");
-                prompt += result.Text;
-            }
-
-            fileStream.Dispose();
-            fileStream.Close();
 
             // Delete the audio file
             try
             {
+                using (var fileStream = File.OpenRead(wavFileName))
+                {
+                    // This section processes the audio file and prints the results (start time, end time and text) to the console.
+                    await foreach (var result in processor.ProcessAsync(fileStream))
+                    {
+                        Console.WriteLine($"{result.Start}->{result.End}: {result.Text}");
+                        if (!result.Text.Contains("[BLANK_AUDIO]"))
+                        {
+                            prompt += result.Text;
+                        }
+                    }
+                }
+
                 File.Delete(wavFileName);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
             }
-            
+
             return prompt;
         }
 
-        static async Task<string> Chat(string prompt)
+        static string InputPrompt()
+        {
+            string prompt = Console.ReadLine() ?? string.Empty;
+            return prompt;
+        }
+
+        static async Task<string> Chat(string prompt, string context = "")
         {
             string generated = string.Empty;
 
-            Console.Write("You: ");
-
-            if (prompt == string.Empty)
-            {
-                // Input prompt
-                prompt = Console.ReadLine() ?? string.Empty;
-            }
-            else
-            {
-                // Output voice recognition data
-                Console.WriteLine(prompt);
-            }
-
+            Console.WriteLine("");
             Console.Write("AI: ");
 
+            string request = 
+                $"This is a context information: {context}\r\n" +
+                $"This is a question. Please answer it based on context information: {prompt}";
+
             // Start generation
-            await foreach (var answerToken in new Chat(OllamaClient).SendAsync(prompt))
+            await foreach (var answerToken in new Chat(OllamaClient).SendAsync(request))
             {
                 generated += answerToken;
                 Console.Write(answerToken);
@@ -117,59 +117,76 @@ namespace OllamaSharpTest
 
         static async Task<List<float[]>> Embed(string prompt)
         {
-            var result = await OllamaClient.EmbedAsync(prompt);
-            List<float[]> vectors = result.Embeddings;
+            List<float[]>? embeddings = null;
 
-            // Commented out due to large number of outputs
-
-            /*
-            // Display numeric vector
-            Console.WriteLine("Embedding Vector:");
-            foreach (var embedding in result.Embeddings)
+            try
             {
-                foreach(var value in embedding)
-                {
+                OllamaClient.SelectedModel = "mxbai-embed-large";
+                var result = await OllamaClient.EmbedAsync(prompt);
+                embeddings = result.Embeddings;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            finally
+            {
+                OllamaClient.SelectedModel = "phi3";
 
-                    Console.Write($"{value:F6} ");
+                if (embeddings == null)
+                {
+                    embeddings = new List<float[]>();
                 }
             }
 
-            Console.WriteLine();
-            */
-
-            return vectors;
+            return embeddings;
         }
 
-        static async Task hoge()
+        static async Task<string> Query(float[] queryEmbedding)
         {
+            const string processName = "chroma";
+            const string collectionName = "docs";
+
+            string context = string.Empty;
+
+            bool isRunning = Process.GetProcessesByName(processName).Length != 0;
+            if (!isRunning)
+            {
+                Console.WriteLine("ChromaDB is not running.");
+                return context;
+            }
+
+            // Connect to ChromaDB
             var configOptions = new ChromaConfigurationOptions(uri: "http://localhost:8000/api/v1/");
             using var httpClient = new HttpClient();
             var client = new ChromaClient(configOptions, httpClient);
 
-            var string5Collection = client.GetOrCreateCollection("string5");
-            var string5Client = new ChromaCollectionClient(await string5Collection, configOptions, httpClient);
+            // Create or Get a collection
+            var collection = await client.GetOrCreateCollection(collectionName);
+            var collectionClient = new ChromaCollectionClient(collection, configOptions, httpClient);
 
-            string5Client.Add(["340a36ad-c38a-406c-be38-250174aee5a4"], embeddings: [new([1f, 0.5f, 0f, -0.5f, -1f])]);
+            // Query the database
+            var queryData = await collectionClient.Query([new(queryEmbedding)]);
 
-            var getResult = string5Client.Get("340a36ad-c38a-406c-be38-250174aee5a4", include: ChromaGetInclude.Metadatas | ChromaGetInclude.Documents | ChromaGetInclude.Embeddings);
-            Console.WriteLine($"ID: {getResult!.Id}");
+            foreach (var item in queryData)
+            {
+                foreach (var entry in item)
+                {
+                    context += $"{entry.Document}\r\n";
+                }
+            }
+
+            return context;
         }
 
         static async Task Main()
         {
             // Initialize Ollama
             var uri = new Uri("http://localhost:11434");
-            OllamaClient = new OllamaApiClient(uri);
-
-            // select a model which should be used for further operations
-            OllamaClient.SelectedModel = "phi3";
-
-            // Listing all models that are available locally
-            var models = await OllamaClient.ListLocalModelsAsync();
-            Console.WriteLine($"Connecting to {uri} ...");
+            OllamaClient = new OllamaApiClient(uri) { SelectedModel = "phi3" };
 
             // Pulling a model and reporting progress
-            // Send/receive log
+            // If the model doesn't exist, download it.
             await foreach (var status in OllamaClient.PullModelAsync("phi3"))
             {
                 Console.WriteLine($"{status.Percent}% {status.Status}");
@@ -178,9 +195,7 @@ namespace OllamaSharpTest
             Console.WriteLine();
 
             string prompt = string.Empty;
-
-            // Chromadb.Client サンプルコード動作確認用（削除予定）
-            await hoge();
+            string context = string.Empty;
 
 #if true
             while (true)
@@ -191,11 +206,31 @@ namespace OllamaSharpTest
                     prompt = await Record();
                 }
 
-                // Chat with AI
-                string script = await Chat(prompt);
+                if (prompt == string.Empty)
+                {
+                    // Enter the prompt
+                    Console.Write($"You: {prompt}");
+                    prompt = InputPrompt();
+                }
+                else
+                {
+                    Console.Write($"You: {prompt}");
+                }
 
                 // Convert prompt to numeric vector
-                await Embed(prompt);
+                List<float[]> queryEmbeddings = await Embed(prompt);
+
+                if (queryEmbeddings.Count != 0)
+                {
+                    // Searching the database and extracting context
+                    foreach (var queryEmbedding in queryEmbeddings)
+                    {
+                        context += await Query(queryEmbedding);
+                    }
+                }
+
+                // Chat with AI
+                string script = await Chat(prompt, context);
 
                 if (true)
                 {
