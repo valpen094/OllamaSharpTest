@@ -1,7 +1,8 @@
 # OllamaSharpTest
 
 # ■言語
-C#
+- C#
+- Python
 
 # ■事前準備
 ## Ollama
@@ -24,12 +25,15 @@ C#
    ![image](https://github.com/user-attachments/assets/dfe868ba-0b94-4601-9c8e-d3ad04b26220)
 
 # ■ツール
-## ./python/convert.py 
+## ./python/convert_database.py 
 ./convert に置かれているファイルをベクトルデータに変換し、chromadbに一括追加する。
 1. `pip install ollama`
 2. `pip install chromadb`
 3. `pip install pandas`
 4. `pip install os`
+
+## ./python/reset_database.py 
+./chromadb のデータベース情報をクリアする。ファイル容量は変わらない。
 
 # ■データセット
 - e-Stat (https://www.e-stat.go.jp/stat-search/files?page=1&query=csv&layout=dataset)
