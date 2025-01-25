@@ -57,7 +57,7 @@ C#製のRAGアプリ。データベースを操作するツールはPythonで作
 ./chromadb のデータベース情報をクリアする。ファイル容量は変わらない。
 - `pip install chromadb`
 
-## ./python/reset_database.py 
+## ./python/query_database.py 
 ./chromadb のデータベースからベクトル距離が近い情報を抽出する。検索したい内容はスクリプトのuser_textを編集すること。
 - `pip install ollama`
 - `pip install chromadb`
