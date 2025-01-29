@@ -32,6 +32,9 @@ C#製のRAGアプリ。データベースを操作するツールはPythonで作
    ![image](https://github.com/user-attachments/assets/dfe868ba-0b94-4601-9c8e-d3ad04b26220)
 4. ./python/add_database.py を使うなどしてchromadbにレコードを追加する。
 
+## CUDA Toolkit
+Nvidia製グラボを持っており、GPUを使って推論させたい場合はインストールすること。<br>インストール方法などはこちらのサイトを参考にする。https://zenn.dev/yumizz/articles/73d6c7d1085d2f
+
 # ■How To
 1. 上記の事前準備を済ませる。
 2. OllamaSharpTest.sln をビルドする。
