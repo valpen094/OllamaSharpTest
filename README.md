@@ -55,17 +55,16 @@ C#製のRAGアプリ。データベースを操作するツールはPythonで作
    
 ## ./python/reset_database.py 
 ./chromadb のデータベース情報をクリアする。ファイル容量は変わらない。
-- `pip install chromadb`
 
 ## ./python/query_database.py 
 ./chromadb のデータベースからベクトル距離が近い情報を抽出する。検索したい内容はスクリプトのuser_textを編集すること。
-- `pip install ollama`
-- `pip install chromadb`
-  
+
 ## ./python/to_utf8.py
-./convert に置かれているファイルをutf-8に変換して./convert/utf8 に保存する。（元からutf-8のファイルも含む）
-1. `pip install codecs`
-2. `pip install chardet`
+./convert に置かれているファイルをutf-8に変換して./convert/utf8 に保存する。
+.docx, .doc, .xlsx, .xls, .csv, .txt, .pdfに対応済み。
+
+## ./python/to_utf8_using_MarkItDown.py
+./convert に置かれているファイルをマークダウン形式かつutf-8に変換して./convert/utf8 に保存する。（ファイル形式は.txt）<br>to_utf8.pyでサポートしていないファイル形式も対応できるはずだが、テキストの中身によってはエラーになる。
 
 # ■データセット
 - e-Stat (https://www.e-stat.go.jp/stat-search/files?page=1&query=csv&layout=dataset)
